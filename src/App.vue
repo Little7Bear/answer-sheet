@@ -3,7 +3,7 @@
     <ul class="list">
       <li v-for="(item, index) in list" :key="index" class="list-item">
         <div class="list-index">{{ index + 1 }}.</div>
-        <el-input v-model="item.value" class="list-input" />
+        <el-input v-model="item.value" class="list-input" @change="changeAnswer(item)" />
         <el-icon v-if="item.validity === 1" :size="20" color="#67C23A">
           <Check />
         </el-icon>
@@ -24,10 +24,17 @@
   import { ref } from 'vue'
   import { Check, Close } from '@element-plus/icons-vue'
 
-  const list = ref<{ value: string; validity: number }[]>([])
+  type Item = {
+    value: string
+    validity: number
+  }
+
+  const list = ref<Item[]>([])
   for (let i = 0; i < 100; i++) {
     list.value.push({ value: '', validity: 0 })
   }
+
+  fetchData()
 
   const answer = ref(['a'])
   let count = ref(0)
@@ -47,6 +54,20 @@
     })
     count.value = count1
     errorCount.value = count2
+  }
+
+  const changeAnswer = (item: Item) => {
+    if (item.value === '') {
+      item.validity = 0
+    }
+    localStorage.setItem('answer', JSON.stringify(list.value))
+  }
+
+  function fetchData() {
+    const data = localStorage.getItem('answer')
+    if (data) {
+      list.value = JSON.parse(data)
+    }
   }
 </script>
 
