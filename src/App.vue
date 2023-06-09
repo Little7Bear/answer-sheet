@@ -1,17 +1,25 @@
 <template>
   <div class="wrapper">
-    <ul class="list">
-      <li v-for="(item, index) in list" :key="index" class="list-item">
-        <div class="list-index">{{ index + 1 }}.</div>
-        <el-input v-model="item.value" class="list-input" @change="changeAnswer(item)" />
-        <el-icon v-if="item.validity === 1" :size="20" color="#67C23A">
-          <Check />
-        </el-icon>
-        <el-icon v-if="item.validity === 2" :size="20" color="#F56C6C">
-          <Close />
-        </el-icon>
-      </li>
-    </ul>
+    <h1 class="title">{{ title }}</h1>
+    <template v-for="question in questionList" :key="question.name">
+      <div>
+        {{ question.name }}，正确：{{ question.count }}，错误{{ question.errorCount }}，{{ question.count }}/{{
+          question.value[1] - question.value[0]
+        }}
+      </div>
+      <ul class="list">
+        <li v-for="(item, index) in list.slice(question.value[0], question.value[1])" :key="index" class="list-item">
+          <div class="list-index">{{ question.value[0] + index + 1 }}.</div>
+          <el-input v-model="item.value" class="list-input" @change="changeAnswer(item)" />
+          <el-icon v-if="item.validity === 1" :size="20" color="#67C23A">
+            <Check />
+          </el-icon>
+          <el-icon v-if="item.validity === 2" :size="20" color="#F56C6C">
+            <Close />
+          </el-icon>
+        </li>
+      </ul>
+    </template>
 
     <div>
       <el-button class="btn" type="primary" @click="onCalc">计算答案</el-button>
@@ -36,7 +44,108 @@
 
   fetchData()
 
-  const answer = ref(['a'])
+  const answer = ref([
+    'c',
+    'c',
+    'b',
+    'a',
+    'd',
+    'd',
+    'c',
+    'a',
+    'b',
+    'd',
+    'b',
+    'd',
+    'd',
+    'b',
+    'd',
+    'c',
+    'a',
+    'a',
+    'c',
+    'd',
+    'a',
+    'b',
+    'b',
+    'c',
+    'd',
+    'b',
+    'a',
+    'b',
+    'd',
+    'c',
+    'd',
+    'b',
+    'b',
+    'c',
+    'a',
+    'a',
+    'c',
+    'b',
+    'c',
+    'a',
+    'b',
+    'd',
+    'b',
+    'a',
+    'd',
+    'c',
+    'a',
+    'b',
+    'c',
+    'd',
+    'c',
+    'd',
+    'd',
+    'c',
+    'b',
+    'a',
+    'd',
+    'a',
+    'c',
+    'c',
+    'b',
+    'b',
+    'b',
+    'c',
+    'd',
+    'b',
+    'd',
+    'b',
+    'b',
+    'd',
+    'd',
+    'a',
+    'd',
+    'd',
+    'a',
+    'c',
+    'a',
+    'a',
+    'c',
+    'c',
+    'a',
+    'b',
+    'a',
+    'c',
+    'd',
+    'c',
+    'a',
+    'b',
+    'a',
+    'd',
+    'b',
+    'b',
+    'c',
+    'a',
+    'd',
+    'b',
+    'c',
+    'b',
+    'b',
+    'a',
+  ])
   let count = ref(0)
   let errorCount = ref(0)
   const onCalc = () => {
@@ -54,6 +163,20 @@
     })
     count.value = count1
     errorCount.value = count2
+
+    for (let i = 0; i < questionList.value.length; i++) {
+      const item = questionList.value[i]
+      item.count = 0
+      for (let j = item.value[0]; j < item.value[1]; j++) {
+        const jItem = list.value[j]
+        if (jItem.validity === 1) {
+          item.count++
+        }
+        if (jItem.validity === 2) {
+          item.errorCount++
+        }
+      }
+    }
   }
 
   const changeAnswer = (item: Item) => {
@@ -62,6 +185,16 @@
     }
     localStorage.setItem('answer', JSON.stringify(list.value))
   }
+
+  const questionList = ref([
+    { name: '常识判断', value: [0, 20], count: 0, errorCount: 0 },
+    { name: '言语理解与表达', value: [20, 45], count: 0, errorCount: 0 },
+    { name: '数量关系', value: [45, 50], count: 0, errorCount: 0 },
+    { name: '判断推理', value: [50, 85], count: 0, errorCount: 0 },
+    { name: '资料分析', value: [85, 100], count: 0, errorCount: 0 },
+  ])
+
+  const title = ref('2021年5月')
 
   function fetchData() {
     const data = localStorage.getItem('answer')
@@ -82,12 +215,8 @@
     list-style: none;
   }
 
-  .wrapper {
-    display: flex;
-  }
-
   .btn {
-    margin-left: 16px;
+    margin-top: 16px;
   }
 
   .list {
@@ -118,5 +247,10 @@
   .answer {
     margin-top: 10px;
     margin-left: 10px;
+  }
+
+  .title {
+    font-size: 26px;
+    line-height: 2;
   }
 </style>
